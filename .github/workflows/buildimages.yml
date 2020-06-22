@@ -30,10 +30,10 @@ jobs:
         echo "deb http://archive.canonical.com/ubuntu bionic partner" | sudo tee -a /etc/apt/sources.list
 
     - name: Build Ubuntu docker xenial baseimage
-      run: ./ubuntu/ubuntu-baseimage xenial ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      run: sudo ./ubuntu/ubuntu-baseimage xenial ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
     - name: Build Ubuntu docker bionic baseimage
-      run: ./ubuntu/ubuntu-baseimage bionic ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      run: sudo ./ubuntu/ubuntu-baseimage bionic ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
     - name: Build Ubuntu docker focal baseimage
-      run: ./ubuntu/ubuntu-baseimage focal ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      run: sudo ./ubuntu/ubuntu-baseimage focal ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
     - name: Completed image build
       run: echo "completed image build"
