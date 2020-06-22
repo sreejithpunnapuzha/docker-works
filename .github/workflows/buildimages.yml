@@ -37,3 +37,14 @@ jobs:
         run: ./centos-7/centos-7-baseimage ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
       - name: Completed image build
         run: echo "completed image build"
+
+  centos_8_image:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/centos:8-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 8 baseimage
+        run: ./centos-8/centos-8-baseimage ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      - name: Completed image build
+        run: echo "completed image build"
