@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -e
+
+DOCKER_REGISTRY=$1
+DOCKER_USER=$2
+DOCKER_PWD=$3
+
+# Create a folder for our new root structure
+WORKSPACEDIR="$(mktemp -d -p /var/tmp baseimg-tmp.XXXXXX)"
+centos_root=${WORKSPACEDIR}/rootfs
+mkdir -p $centos_root
+
+# initialize rpm database
+rpm --root $centos_root --initdb
+
+# download and install the centos-release package, it contains our repository sources
+dnf reinstall -y --downloadonly --downloaddir . centos-release
+dnf reinstall -y --downloadonly --downloaddir . centos-gpg-keys
+dnf reinstall -y --downloadonly --downloaddir . centos-repos
+rpm --nodeps --root $centos_root -ivh centos-release*.rpm
+rpm --nodeps --root $centos_root -ivh centos-gpg-keys*.rpm
+rpm --nodeps --root $centos_root -ivh centos-repos*.rpm
+rpm --nodeps --root $centos_root -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+rpm --root $centos_root --import $centos_root/etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+# install dnf without docs and install only the english language files during the process
+dnf -y --installroot=$centos_root --setopt=tsflags='nodocs' --setopt=override_install_langs=en_US.utf8 install dnf tar gzip
+
+# configure dnf to avoid installing of docs and other language files than english generally
+sed -i "/distroverpkg=centos-release/a override_install_langs=en_US.utf8\ntsflags=nodocs" $centos_root/etc/dnf/dnf.conf
+
+# chroot to the environment and install some additional tools
+cp /etc/resolv.conf $centos_root/etc
+chroot $centos_root /bin/bash <<EOF
+mknod -m 666 /dev/random c 1 8
+mknod -m 666 /dev/urandom c 1 9
+dnf update -y
+dnf clean all
+EOF
+rm -f $centos_root/etc/resolv.conf
+
+# create docker image
+tar -C $centos_root -c . | docker import - "${DOCKER_REGISTRY}/${DOCKER_USER}/centos:8"
+
+docker login ${DOCKER_REGISTRY} -u ${DOCKER_USER} -p ${DOCKER_PWD}
+docker push ${DOCKER_REGISTRY}/${DOCKER_USER}/centos:8
