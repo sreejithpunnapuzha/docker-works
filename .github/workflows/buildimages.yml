@@ -1,25 +1,15 @@
-# This is a basic workflow to help you get started with Actions
+name: Docker Build CI
 
-name: CI
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   ubuntu_image:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     - name: Add repos
       run: |
@@ -28,7 +18,6 @@ jobs:
         echo "deb http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
         echo "deb http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
         echo "deb http://archive.canonical.com/ubuntu bionic partner" | sudo tee -a /etc/apt/sources.list
-
     - name: Build Ubuntu docker xenial baseimage
       run: sudo ./ubuntu/ubuntu-baseimage xenial ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
     - name: Build Ubuntu docker bionic baseimage
@@ -37,3 +26,14 @@ jobs:
       run: sudo ./ubuntu/ubuntu-baseimage focal ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
     - name: Completed image build
       run: echo "completed image build"
+
+  centos_7_image:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/centos:7-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 7 baseimage
+        run: ./centos-7/centos-7-baseimage ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      - name: Completed image build
+        run: echo "completed image build"
