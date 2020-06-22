@@ -6,7 +6,7 @@ DOCKER_REGISTRY=$2
 DOCKER_USER=$3
 DOCKER_PWD=$4
 
-apt-get update && apt-get install -y multistrap docker.io
+sudo apt-get update && sudo apt-get install -y multistrap docker.io
 
 cat << EOF | tee ${WORKSPACEDIR}/xenial.conf
 [General]
