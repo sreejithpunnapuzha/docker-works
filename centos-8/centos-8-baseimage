@@ -6,6 +6,9 @@ DOCKER_REGISTRY=$1
 DOCKER_USER=$2
 DOCKER_PWD=$3
 
+# Update packages in image to latest
+dnf update -y
+
 # Create a folder for our new root structure
 WORKSPACEDIR="$(mktemp -d -p /var/tmp baseimg-tmp.XXXXXX)"
 centos_root=${WORKSPACEDIR}/rootfs
