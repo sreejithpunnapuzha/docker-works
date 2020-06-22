@@ -48,3 +48,88 @@ jobs:
         run: ./centos-8/centos-8-baseimage ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
       - name: Completed image build
         run: echo "completed image build"
+
+  centos_7_docker:
+    runs-on: ubuntu-latest
+
+    container:
+      image: quay.io/sreejithp/centos:7-dind-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 7 with docker
+        run: |
+          cd centos-7/docker/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-docker-latest
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-docker-latest
+      - name: Completed image build
+        run: echo "completed image build"
+
+    needs: centos_7_image
+
+  centos_7_dind:
+    runs-on: ubuntu-latest
+
+    container:
+      image: quay.io/sreejithp/centos:7-dind-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 7 with dind
+        run: |
+          cd centos-7/dind/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-dind-latest
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-dind-latest
+      - name: Completed image build
+        run: echo "completed image build"
+
+    needs: centos_7_docker
+
+  centos_8_docker:
+    runs-on: ubuntu-latest
+
+    container:
+      image: quay.io/sreejithp/centos:8-dind-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 8 with docker
+        run: |
+          cd centos-8/docker/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-docker-latest
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-docker-latest
+      - name: Completed image build
+        run: echo "completed image build"
+
+    needs: centos_8_image
+
+  centos_8_dind:
+    runs-on: ubuntu-latest
+
+    container:
+      image: quay.io/sreejithp/centos:8-dind-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Centos 8 with dind
+        run: |
+          cd centos-8/dind/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-dind-latest
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-dind-latest
+      - name: Completed image build
+        run: echo "completed image build"
+
+    needs: centos_8_docker
+
