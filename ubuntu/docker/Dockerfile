@@ -1,10 +1,13 @@
-FROM quay.io/sreejithp/ubuntu:bionic
+ARG FROM=quay.io/sreejithp/ubuntu:bionic
+FROM ${FROM}
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" > /etc/apt/sources.list; \
-	echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
-	echo "deb http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse" >> /etc/apt/sources.list; \
-	echo "deb http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
-	echo "deb http://archive.canonical.com/ubuntu bionic partner" >> /etc/apt/sources.list; \
+ARG UBUNTU_RELEASE=bionic
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu ${UBUNTU_RELEASE} main restricted universe multiverse" > /etc/apt/sources.list; \
+	echo "deb http://archive.ubuntu.com/ubuntu ${UBUNTU_RELEASE}-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+	echo "deb http://archive.ubuntu.com/ubuntu ${UBUNTU_RELEASE}-backports main restricted universe multiverse" >> /etc/apt/sources.list; \
+	echo "deb http://security.ubuntu.com/ubuntu ${UBUNTU_RELEASE}-security main restricted universe multiverse" >> /etc/apt/sources.list; \
+	echo "deb http://archive.canonical.com/ubuntu ${UBUNTU_RELEASE} partner" >> /etc/apt/sources.list; \
 	apt update && apt dist-upgrade -y; \
 	apt install -y wget ca-certificates openssh-client \
 	&& apt autoremove -y && apt clean && rm -rf /var/lib/apt/lists/*

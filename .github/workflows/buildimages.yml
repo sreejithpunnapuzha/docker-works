@@ -2,30 +2,138 @@ name: Docker Build CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   ubuntu_image:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Add repos
-      run: |
-        echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-        echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-        echo "deb http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-        echo "deb http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-        echo "deb http://archive.canonical.com/ubuntu bionic partner" | sudo tee -a /etc/apt/sources.list
-    - name: Build Ubuntu docker xenial baseimage
-      run: sudo ./ubuntu/ubuntu-baseimage xenial ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
-    - name: Build Ubuntu docker bionic baseimage
-      run: sudo ./ubuntu/ubuntu-baseimage bionic ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
-    - name: Build Ubuntu docker focal baseimage
-      run: sudo ./ubuntu/ubuntu-baseimage focal ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
-    - name: Completed image build
-      run: echo "completed image build"
+      - uses: actions/checkout@v2
+      - name: Add repos
+        run: |
+          echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb http://archive.canonical.com/ubuntu bionic partner" | sudo tee -a /etc/apt/sources.list
+      - name: Build Ubuntu docker xenial baseimage
+        run: sudo ./ubuntu/ubuntu-baseimage xenial ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      - name: Build Ubuntu docker bionic baseimage
+        run: sudo ./ubuntu/ubuntu-baseimage bionic ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      - name: Build Ubuntu docker focal baseimage
+        run: sudo ./ubuntu/ubuntu-baseimage focal ${{ secrets.QUAYIOREPO }} ${{ secrets.QUAYIOUSER }} ${{ secrets.QUAYIOPWD }}
+      - name: Completed image build
+        run: echo "completed image build"
+
+  ubuntu_xenial_docker:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu xenial with docker
+        run: |
+          cd ubuntu/docker/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:xenial-docker-latest --build-arg FROM="quay.io/sreejithp/ubuntu:xenial" --build-arg UBUNTU_RELEASE=xenial
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:xenial-docker-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_image
+
+  ubuntu_xenial_dind:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu xenial with dind
+        run: |
+          cd ubuntu/dind/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:xenial-dind-latest --build-arg FROM="quay.io/sreejithp/ubuntu:xenial-docker-latest"
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:xenial-dind-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_xenial_docker
+
+  ubuntu_bionic_docker:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu bionic with docker
+        run: |
+          cd ubuntu/docker/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:bionic-docker-latest --build-arg FROM="quay.io/sreejithp/ubuntu:bionic" --build-arg UBUNTU_RELEASE=bionic
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:bionic-docker-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_image
+
+  ubuntu_bionic_dind:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu bionic with dind
+        run: |
+          cd ubuntu/dind/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:bionic-dind-latest --build-arg FROM="quay.io/sreejithp/ubuntu:bionic-docker-latest"
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:bionic-dind-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_bionic_docker
+
+  ubuntu_focal_docker:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu focal with docker
+        run: |
+          cd ubuntu/docker/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:focal-docker-latest --build-arg FROM="quay.io/sreejithp/ubuntu:focal" --build-arg UBUNTU_RELEASE=focal
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:focal-docker-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_image
+
+  ubuntu_focal_dind:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/sreejithp/ubuntu:bionic-dind-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Ubuntu focal with dind
+        run: |
+          cd ubuntu/dind/
+          docker build -f Dockerfile . -t ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:focal-dind-latest --build-arg FROM="quay.io/sreejithp/ubuntu:focal-docker-latest"
+      - name: Login to Docker registry
+        run: docker login ${{ secrets.QUAYIOREPO }} -u ${{ secrets.QUAYIOUSER }} -p ${{ secrets.QUAYIOPWD }}
+      - name: Push image to Docker registry
+        run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/ubuntu:focal-dind-latest
+      - name: Completed image build
+        run: echo "completed image build"
+    needs: ubuntu_focal_docker
 
   centos_7_image:
     runs-on: ubuntu-latest
@@ -51,10 +159,8 @@ jobs:
 
   centos_7_docker:
     runs-on: ubuntu-latest
-
     container:
       image: quay.io/sreejithp/centos:7-dind-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Build Centos 7 with docker
@@ -67,15 +173,12 @@ jobs:
         run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-docker-latest
       - name: Completed image build
         run: echo "completed image build"
-
     needs: centos_7_image
 
   centos_7_dind:
     runs-on: ubuntu-latest
-
     container:
       image: quay.io/sreejithp/centos:7-dind-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Build Centos 7 with dind
@@ -88,15 +191,12 @@ jobs:
         run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:7-dind-latest
       - name: Completed image build
         run: echo "completed image build"
-
     needs: centos_7_docker
 
   centos_8_docker:
     runs-on: ubuntu-latest
-
     container:
       image: quay.io/sreejithp/centos:8-dind-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Build Centos 8 with docker
@@ -109,15 +209,12 @@ jobs:
         run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-docker-latest
       - name: Completed image build
         run: echo "completed image build"
-
     needs: centos_8_image
 
   centos_8_dind:
     runs-on: ubuntu-latest
-
     container:
       image: quay.io/sreejithp/centos:8-dind-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Build Centos 8 with dind
@@ -130,6 +227,4 @@ jobs:
         run: docker push ${{ secrets.QUAYIOREPO }}/${{ secrets.QUAYIOUSER }}/centos:8-dind-latest
       - name: Completed image build
         run: echo "completed image build"
-
     needs: centos_8_docker
-

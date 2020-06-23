@@ -1,4 +1,5 @@
-FROM quay.io/sreejithp/ubuntu-docker:latest
+ARG FROM=quay.io/sreejithp/ubuntu:bionic-docker-latest
+FROM ${FROM}
 
 RUN set -eux; \
 	apt update && apt dist-upgrade -y; \
