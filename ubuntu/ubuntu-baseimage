@@ -26,20 +26,20 @@ unpack=true
 bootstrap=xenial xenial-updates xenial-security
 
 [xenial]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 keyring=ubuntu-keyring
 suite=xenial
 components=main multiverse restricted universe
 
 [xenial-updates]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=xenial-updates
 components=main multiverse restricted universe
 
 [xenial-security]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=xenial-security
 components=main multiverse restricted universe
@@ -56,20 +56,20 @@ unpack=true
 bootstrap=bionic bionic-updates bionic-security
 
 [bionic]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 keyring=ubuntu-keyring
 suite=bionic
 components=main multiverse restricted universe
 
 [bionic-updates]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=bionic-updates
 components=main multiverse restricted universe
 
 [bionic-security]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=bionic-security
 components=main multiverse restricted universe
@@ -84,19 +84,22 @@ noauth=false
 explicitsuite=false
 unpack=true
 bootstrap=focal focal-updates focal-security
+
 [focal]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 keyring=ubuntu-keyring
 suite=focal
 components=main multiverse restricted universe
+
 [focal-updates]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=focal-updates
 components=main multiverse restricted universe
+
 [focal-security]
-packages=apt kmod iproute2
+packages=apt kmod iproute2 curl wget
 source=http://archive.ubuntu.com/ubuntu
 suite=focal-security
 components=main multiverse restricted universe
